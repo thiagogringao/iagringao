@@ -9,6 +9,7 @@ import { preloadCriticalCache, incrementalBackup } from './cache-middleware';
 import { preloadAllProducts } from './products-cache-middleware';
 import { executeExternalQuery } from './external-db';
 import { initRedis, closeRedis } from './redis-cache';
+import path from 'path';
 
 dotenv.config();
 
@@ -86,6 +87,15 @@ app.use(
     },
   })
 );
+
+// Servir arquivos estáticos do frontend
+const clientDistPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+
+// Rota catch-all para servir o index.html do frontend
+app.get('*_path', (req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
 
 // Health check
 app.get('/health', (req, res) => {
